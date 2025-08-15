@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reset Password - NineT</title>
+    <title>Reset Password - NineT (Debug)</title>
     <meta name="description" content="Reset your NineT password securely">
     <style>
         * {
@@ -37,7 +37,7 @@
         }
         
         .container {
-            max-width: 400px;
+            max-width: 600px;
             width: 90%;
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
@@ -75,6 +75,24 @@
             color: #9CA3AF;
             margin-bottom: 32px;
             font-size: 14px;
+        }
+        
+        .debug-section {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid #3B82F6;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .debug-title {
+            color: #60A5FA;
+            font-weight: bold;
+            margin-bottom: 8px;
         }
         
         .form-group {
@@ -173,10 +191,6 @@
             text-decoration: underline;
         }
         
-        .hidden {
-            display: none;
-        }
-        
         .loading {
             display: inline-block;
             width: 16px;
@@ -207,12 +221,18 @@
     <div id="particles"></div>
     <div class="container">
         <div class="logo">N</div>
-        <h1>Reset Your Password</h1>
-        <p class="subtitle">Enter your new password below</p>
+        <h1>Debug: Reset Password</h1>
+        <p class="subtitle">Debugging password reset link parameters</p>
+        
+        <!-- DEBUG SECTION -->
+        <div class="debug-section">
+            <div class="debug-title">🔍 URL DEBUG INFO:</div>
+            <div id="debugInfo">Loading URL parameters...</div>
+        </div>
         
         <div id="message"></div>
         
-        <form id="resetForm">
+        <form id="resetForm" style="display: none;">
             <div class="form-group">
                 <label for="password">New Password</label>
                 <input 
@@ -247,11 +267,11 @@
         </div>
         
         <div class="footer">
-            <p>© 2025 NineT. Secure password reset.</p>
+            <p>© 2025 NineT. Debug mode active.</p>
         </div>
     </div>
 
-    <!-- Fixed Supabase Loading with Multiple Fallbacks -->
+    <!-- Debug Script -->
     <script>
         // Configuration
         const SUPABASE_CONFIG = {
@@ -262,76 +282,86 @@
         // Global variables
         let supabase = null;
         
-        // Utility functions
-        function showMessage(text, type = 'info') {
-            const messageDiv = document.getElementById('message');
-            messageDiv.innerHTML = `<div class="message ${type}">${text}</div>`;
+        // Debug function to show all URL parameters
+        function debugUrlParameters() {
+            const debugDiv = document.getElementById('debugInfo');
+            const url = window.location.href;
+            const urlParams = new URLSearchParams(window.location.search);
+            const hash = window.location.hash;
+            const hashParams = new URLSearchParams(hash.substring(1));
+            
+            let debugHTML = `
+                <strong>Current URL:</strong><br>
+                ${url}<br><br>
+                
+                <strong>Query Parameters (?param=value):</strong><br>
+            `;
+            
+            if (urlParams.toString()) {
+                for (let [key, value] of urlParams) {
+                    debugHTML += `${key}: ${value}<br>`;
+                }
+            } else {
+                debugHTML += `(none)<br>`;
+            }
+            
+            debugHTML += `<br><strong>Hash Parameters (#param=value):</strong><br>`;
+            
+            if (hashParams.toString()) {
+                for (let [key, value] of hashParams) {
+                    debugHTML += `${key}: ${value}<br>`;
+                }
+            } else {
+                debugHTML += `(none)<br>`;
+            }
+            
+            debugHTML += `<br><strong>Expected Parameters:</strong><br>
+                - access_token: ${urlParams.get('access_token') || hashParams.get('access_token') || 'NOT FOUND'}<br>
+                - refresh_token: ${urlParams.get('refresh_token') || hashParams.get('refresh_token') || 'NOT FOUND'}<br>
+                - type: ${urlParams.get('type') || hashParams.get('type') || 'NOT FOUND'}<br>
+                - expires_at: ${urlParams.get('expires_at') || hashParams.get('expires_at') || 'NOT FOUND'}<br>
+                - token_type: ${urlParams.get('token_type') || hashParams.get('token_type') || 'NOT FOUND'}
+            `;
+            
+            debugDiv.innerHTML = debugHTML;
         }
 
         function getUrlParams() {
             const urlParams = new URLSearchParams(window.location.search);
+            const hashParams = new URLSearchParams(window.location.hash.substring(1));
+            
             return {
-                access_token: urlParams.get('access_token'),
-                refresh_token: urlParams.get('refresh_token'),
-                type: urlParams.get('type')
+                access_token: urlParams.get('access_token') || hashParams.get('access_token'),
+                refresh_token: urlParams.get('refresh_token') || hashParams.get('refresh_token'),
+                type: urlParams.get('type') || hashParams.get('type'),
+                expires_at: urlParams.get('expires_at') || hashParams.get('expires_at'),
+                token_type: urlParams.get('token_type') || hashParams.get('token_type')
             };
         }
 
-        function setLoading(isLoading) {
-            const resetBtn = document.getElementById('resetBtn');
-            if (isLoading) {
-                resetBtn.innerHTML = '<div class="loading"></div>Resetting Password...';
-                resetBtn.disabled = true;
-            } else {
-                resetBtn.innerHTML = 'Reset Password';
-                resetBtn.disabled = false;
-            }
+        function showMessage(text, type = 'info') {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = `<div class="message ${type}">${text}</div>`;
         }
 
         // Load Supabase with multiple fallback methods
         async function loadSupabase() {
             showMessage('Loading authentication system...', 'info');
             
-            // Method 1: Try UNPKG UMD version (most reliable)
             try {
                 await loadScript('https://unpkg.com/@supabase/supabase-js@2.52.1/dist/umd/supabase.js');
                 if (window.supabase && window.supabase.createClient) {
                     supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.key);
-                    console.log('✅ Supabase loaded via UNPKG UMD');
+                    console.log('✅ Supabase loaded successfully');
                     return true;
                 }
             } catch (error) {
-                console.warn('UNPKG UMD failed:', error);
+                console.error('❌ Failed to load Supabase:', error);
+                showMessage('Failed to load authentication system. Please refresh the page.', 'error');
+                return false;
             }
-
-            // Method 2: Try JSDelivr CDN
-            try {
-                await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.52.1/dist/umd/supabase.js');
-                if (window.supabase && window.supabase.createClient) {
-                    supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.key);
-                    console.log('✅ Supabase loaded via JSDelivr');
-                    return true;
-                }
-            } catch (error) {
-                console.warn('JSDelivr failed:', error);
-            }
-
-            // Method 3: Try ES modules as fallback
-            try {
-                const { createClient } = await import('https://unpkg.com/@supabase/supabase-js@2.52.1/dist/module/index.js');
-                supabase = createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.key);
-                console.log('✅ Supabase loaded via ES modules');
-                return true;
-            } catch (error) {
-                console.warn('ES modules failed:', error);
-            }
-
-            // All methods failed
-            console.error('❌ All Supabase loading methods failed');
-            return false;
         }
 
-        // Helper function to load scripts
         function loadScript(src) {
             return new Promise((resolve, reject) => {
                 const script = document.createElement('script');
@@ -346,9 +376,18 @@
         async function initializePage() {
             const params = getUrlParams();
             
-            if (!params.access_token || params.type !== 'recovery') {
-                showMessage('Invalid or expired password reset link. Please request a new one from the app.', 'error');
-                document.getElementById('resetBtn').disabled = true;
+            console.log('🔍 URL Parameters found:', params);
+            
+            // Check if we have the required parameters
+            if (!params.access_token) {
+                showMessage('❌ No access_token found in URL. The reset link may be malformed.', 'error');
+                return;
+            }
+            
+            if (!params.type) {
+                showMessage('⚠️ No type parameter found. Assuming this is a recovery link...', 'info');
+            } else if (params.type !== 'recovery') {
+                showMessage(`❌ Wrong link type: ${params.type}. Expected 'recovery'.`, 'error');
                 return;
             }
 
@@ -360,132 +399,45 @@
             try {
                 console.log('🔄 Setting session with tokens...');
                 
-                const { data, error } = await supabase.auth.setSession({
+                const sessionData = {
                     access_token: params.access_token,
-                    refresh_token: params.refresh_token
-                });
+                    refresh_token: params.refresh_token || ''
+                };
+                
+                console.log('Session data:', sessionData);
+                
+                const { data, error } = await supabase.auth.setSession(sessionData);
 
                 if (error) {
                     throw error;
                 }
 
-                console.log('✅ Session set successfully');
-                showMessage('Ready to reset your password! Enter your new password below.', 'success');
+                console.log('✅ Session set successfully:', data);
+                showMessage('✅ Authentication successful! You can now reset your password.', 'success');
                 
-                // Enable form and focus password field
+                // Show the form
+                document.getElementById('resetForm').style.display = 'block';
                 document.getElementById('password').focus();
 
             } catch (error) {
                 console.error('❌ Session error:', error);
-                showMessage('Invalid or expired reset link. Please request a new password reset from the app.', 'error');
-                document.getElementById('resetBtn').disabled = true;
+                showMessage(`Session error: ${error.message}. Please request a new password reset.`, 'error');
             }
-        }
-
-        // Handle form submission
-        async function handleFormSubmit(e) {
-            e.preventDefault();
-            
-            if (!supabase) {
-                showMessage('Authentication system not ready. Please refresh the page.', 'error');
-                return;
-            }
-            
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-
-            // Validation
-            if (password.length < 6) {
-                showMessage('Password must be at least 6 characters long.', 'error');
-                return;
-            }
-
-            if (password !== confirmPassword) {
-                showMessage('Passwords do not match. Please check and try again.', 'error');
-                return;
-            }
-
-            // Strong password suggestion
-            const hasUpperCase = /[A-Z]/.test(password);
-            const hasLowerCase = /[a-z]/.test(password);
-            const hasNumbers = /\d/.test(password);
-            
-            if (!hasUpperCase || !hasLowerCase || !hasNumbers) {
-                const confirm = window.confirm('For better security, consider using a password with uppercase, lowercase, and numbers. Continue anyway?');
-                if (!confirm) return;
-            }
-
-            setLoading(true);
-
-            try {
-                console.log('🔄 Updating password...');
-                
-                const { data, error } = await supabase.auth.updateUser({
-                    password: password
-                });
-
-                if (error) {
-                    throw error;
-                }
-
-                console.log('✅ Password updated successfully');
-                showMessage('🎉 Password reset successfully! You can now sign in with your new password.', 'success');
-                
-                // Clear form
-                document.getElementById('password').value = '';
-                document.getElementById('confirmPassword').value = '';
-                
-                // Redirect after success
-                setTimeout(() => {
-                    window.location.href = 'https://ninet.io';
-                }, 3000);
-
-            } catch (error) {
-                console.error('❌ Password reset error:', error);
-                setLoading(false);
-                
-                if (error.message.includes('session')) {
-                    showMessage('Your reset session has expired. Please request a new password reset.', 'error');
-                } else {
-                    showMessage(`Reset failed: ${error.message}`, 'error');
-                }
-            }
-        }
-
-        // Input validation feedback
-        function setupInputValidation() {
-            document.getElementById('confirmPassword').addEventListener('input', (e) => {
-                const password = document.getElementById('password').value;
-                const confirmPassword = e.target.value;
-                
-                if (confirmPassword && password !== confirmPassword) {
-                    e.target.style.borderColor = '#EF4444';
-                } else {
-                    e.target.style.borderColor = '#374151';
-                }
-            });
         }
 
         // Initialize everything when page loads
         window.addEventListener('load', async () => {
-            console.log('🚀 Initializing password reset page...');
+            console.log('🚀 Starting debug mode...');
+            
+            // Show debug info immediately
+            debugUrlParameters();
             
             // Load Supabase
             const supabaseLoaded = await loadSupabase();
             
             if (supabaseLoaded) {
-                showMessage('Authentication system ready!', 'success');
-                setTimeout(() => {
-                    initializePage();
-                }, 1000);
-            } else {
-                showMessage('Failed to load authentication system. Please refresh the page or contact support.', 'error');
-                document.getElementById('resetBtn').disabled = true;
+                await initializePage();
             }
-
-            // Setup form handling
-            document.getElementById('resetForm').addEventListener('submit', handleFormSubmit);
-            setupInputValidation();
         });
     </script>
 
