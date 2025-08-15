@@ -202,10 +202,16 @@
     <div id="particles"></div>
     <div class="container">
         <div class="logo">N</div>
-        <h1>Reset Your Password</h1>
-        <p class="subtitle">Enter your new password below</p>
+        <h1>Reset Password (Debug Mode)</h1>
+        <p class="subtitle">Debug mode: Shows URL parameters for troubleshooting</p>
         
         <div id="message"></div>
+        
+        <!-- DEBUG SECTION -->
+        <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid #3B82F6; border-radius: 8px; padding: 16px; margin-bottom: 24px; font-family: monospace; font-size: 12px; max-height: 200px; overflow-y: auto;">
+            <div style="color: #60A5FA; font-weight: bold; margin-bottom: 8px;">🔍 URL DEBUG INFO:</div>
+            <div id="debugInfo">Loading URL parameters...</div>
+        </div>
         
         <div id="resetForm" style="display: none;">
             <div class="form-group">
@@ -242,7 +248,7 @@
         </div>
         
         <div class="footer">
-            <p>© 2025 NineT. Secure password reset.</p>
+            <p>© 2025 NineT. Debug mode active - shows detailed URL info.</p>
         </div>
     </div>
 
@@ -267,12 +273,60 @@
             const urlParams = new URLSearchParams(window.location.search);
             const hashParams = new URLSearchParams(window.location.hash.substring(1));
             
+            // Debug: Show what we're parsing
+            const debugDiv = document.getElementById('debugInfo');
+            const url = window.location.href;
+            
+            let debugHTML = `
+                <strong>Current URL:</strong><br>
+                ${url}<br><br>
+                
+                <strong>Query Parameters (?param=value):</strong><br>
+            `;
+            
+            if (urlParams.toString()) {
+                for (let [key, value] of urlParams) {
+                    debugHTML += `${key}: ${value}<br>`;
+                }
+            } else {
+                debugHTML += `(none)<br>`;
+            }
+            
+            debugHTML += `<br><strong>Hash Parameters (#param=value):</strong><br>`;
+            
+            if (hashParams.toString()) {
+                for (let [key, value] of hashParams) {
+                    debugHTML += `${key}: ${value}<br>`;
+                }
+            } else {
+                debugHTML += `(none)<br>`;
+            }
+            
+            // Check for tokens in both places
+            const access_token = urlParams.get('access_token') || hashParams.get('access_token');
+            const refresh_token = urlParams.get('refresh_token') || hashParams.get('refresh_token');
+            const type = urlParams.get('type') || hashParams.get('type');
+            const error = urlParams.get('error') || hashParams.get('error');
+            const error_description = urlParams.get('error_description') || hashParams.get('error_description');
+            
+            debugHTML += `<br><strong>Parsed Tokens:</strong><br>
+                - access_token: ${access_token ? 'FOUND ✅' : 'NOT FOUND ❌'}<br>
+                - refresh_token: ${refresh_token ? 'FOUND ✅' : 'NOT FOUND ❌'}<br>
+                - type: ${type || 'NOT FOUND ❌'}<br>
+                - error: ${error || 'none'}<br>
+                - error_description: ${error_description || 'none'}
+            `;
+            
+            debugDiv.innerHTML = debugHTML;
+            
             return {
-                access_token: urlParams.get('access_token') || hashParams.get('access_token'),
-                refresh_token: urlParams.get('refresh_token') || hashParams.get('refresh_token'),
-                type: urlParams.get('type') || hashParams.get('type'),
+                access_token,
+                refresh_token,
+                type,
                 expires_at: urlParams.get('expires_at') || hashParams.get('expires_at'),
-                token_type: urlParams.get('token_type') || hashParams.get('token_type')
+                token_type: urlParams.get('token_type') || hashParams.get('token_type'),
+                error,
+                error_description
             };
         }
 
@@ -358,8 +412,18 @@
             
             console.log('🔍 URL Parameters found:', params);
             
+            // Check for Supabase errors first
+            if (params.error) {
+                if (params.error === 'access_denied' && params.error_description?.includes('expired')) {
+                    showMessage('❌ The reset link has expired. Please request a new password reset from your app.', 'error');
+                } else {
+                    showMessage(`❌ Reset error: ${params.error_description || params.error}. Please request a new password reset.`, 'error');
+                }
+                return;
+            }
+            
             if (!params.access_token) {
-                showMessage('❌ No access_token found in URL. Please request a new password reset.', 'error');
+                showMessage('❌ No access_token found in URL. This usually means:<br>• The reset link has expired<br>• You refreshed the page<br>• The link was malformed<br><br>Please request a new password reset from your app.', 'error');
                 return;
             }
             
@@ -461,6 +525,9 @@
         // Initialize when page loads
         window.addEventListener('load', async function() {
             console.log('🚀 Initializing password reset page...');
+            
+            // Show debug info immediately
+            getUrlParams();
             
             showMessage('Loading authentication system...', 'info');
             
