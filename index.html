@@ -272,63 +272,77 @@
         function getUrlParams() {
             const urlParams = new URLSearchParams(window.location.search);
             const hashParams = new URLSearchParams(window.location.hash.substring(1));
-            
+    
             // Debug: Show what we're parsing
             const debugDiv = document.getElementById('debugInfo');
             const url = window.location.href;
-            
+    
             let debugHTML = `
                 <strong>Current URL:</strong><br>
                 ${url}<br><br>
-                
+        
                 <strong>Query Parameters (?param=value):</strong><br>
-            `;
-            
-            if (urlParams.toString()) {
-                for (let [key, value] of urlParams) {
-                    debugHTML += `${key}: ${value}<br>`;
-                }
-            } else {
-                debugHTML += `(none)<br>`;
+           `;
+    
+          if (urlParams.toString()) {
+              for (let [key, value] of urlParams) {
+                  debugHTML += `${key}: ${value}<br>`;
+             }
+         } else {
+              debugHTML += `(none)<br>`;
+         }
+    
+         debugHTML += `<br><strong>Hash Parameters (#param=value):</strong><br>`;
+    
+         if (hashParams.toString()) {
+            for (let [key, value] of hashParams) {
+                debugHTML += `${key}: ${value}<br>`;
             }
-            
-            debugHTML += `<br><strong>Hash Parameters (#param=value):</strong><br>`;
-            
-            if (hashParams.toString()) {
-                for (let [key, value] of hashParams) {
-                    debugHTML += `${key}: ${value}<br>`;
-                }
-            } else {
-                debugHTML += `(none)<br>`;
-            }
-            
-            // Check for tokens in both places
-            const access_token = urlParams.get('access_token') || hashParams.get('access_token');
-            const refresh_token = urlParams.get('refresh_token') || hashParams.get('refresh_token');
-            const type = urlParams.get('type') || hashParams.get('type');
-            const error = urlParams.get('error') || hashParams.get('error');
-            const error_description = urlParams.get('error_description') || hashParams.get('error_description');
-            
-            debugHTML += `<br><strong>Parsed Tokens:</strong><br>
-                - access_token: ${access_token ? 'FOUND ✅' : 'NOT FOUND ❌'}<br>
-                - refresh_token: ${refresh_token ? 'FOUND ✅' : 'NOT FOUND ❌'}<br>
-                - type: ${type || 'NOT FOUND ❌'}<br>
-                - error: ${error || 'none'}<br>
-                - error_description: ${error_description || 'none'}
-            `;
-            
-            debugDiv.innerHTML = debugHTML;
-            
-            return {
-                access_token,
-                refresh_token,
-                type,
-                expires_at: urlParams.get('expires_at') || hashParams.get('expires_at'),
-                token_type: urlParams.get('token_type') || hashParams.get('token_type'),
-                error,
-                error_description
-            };
-        }
+        } else {
+            debugHTML += `(none)<br>`;
+         }
+    
+       // Check for tokens in both places (existing flow)
+       const access_token = urlParams.get('access_token') || hashParams.get('access_token');
+       const refresh_token = urlParams.get('refresh_token') || hashParams.get('refresh_token');
+    
+      // ADDED: Check for Supabase verification parameters
+       const token_hash = urlParams.get('token_hash') || hashParams.get('token_hash');
+       const type = urlParams.get('type') || hashParams.get('type');
+       const next = urlParams.get('next') || hashParams.get('next');
+       const error = urlParams.get('error') || hashParams.get('error');
+       const error_description = urlParams.get('error_description') || hashParams.get('error_description');
+    
+       debugHTML += `<br><strong>Legacy Tokens (Direct):</strong><br>
+        - access_token: ${access_token ? 'FOUND ✅' : 'NOT FOUND ❌'}<br>
+        - refresh_token: ${refresh_token ? 'FOUND ✅' : 'NOT FOUND ❌'}<br>
+        
+        <br><strong>Supabase Verification Parameters:</strong><br>
+        - token_hash: ${token_hash ? 'FOUND ✅' : 'NOT FOUND ❌'}<br>
+        - type: ${type || 'NOT FOUND ❌'}<br>
+        - next: ${next || 'NOT FOUND ❌'}<br>
+        - error: ${error || 'none'}<br>
+        - error_description: ${error_description || 'none'}
+    `;
+    
+    debugDiv.innerHTML = debugHTML;
+    
+    return {
+        // Legacy parameters
+        access_token,
+        refresh_token,
+        expires_at: urlParams.get('expires_at') || hashParams.get('expires_at'),
+        token_type: urlParams.get('token_type') || hashParams.get('token_type'),
+        
+        // ADDED: New Supabase verification parameters
+        token_hash,
+        type,
+        next,
+        error,
+        error_description
+    };
+}
+
 
         function setLoading(isLoading) {
             const resetBtn = document.getElementById('resetBtn');
