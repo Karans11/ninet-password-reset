@@ -202,8 +202,8 @@
     <div id="particles"></div>
     <div class="container">
         <div class="logo">N</div>
-        <h1>Reset Password (Debug Mode)</h1>
-        <p class="subtitle">Debug mode: Shows URL parameters for troubleshooting</p>
+        <h1>Reset Password (Enhanced Debug)</h1>
+        <p class="subtitle">Enhanced debugging with API key validation</p>
         
         <div id="message"></div>
         
@@ -248,11 +248,11 @@
         </div>
         
         <div class="footer">
-            <p>© 2025 NineT. Debug mode active - shows detailed URL info.</p>
+            <p>© 2025 NineT. Enhanced debug mode with API validation.</p>
         </div>
     </div>
 
-    <!-- Load Supabase with better error handling -->
+    <!-- Enhanced Supabase integration with comprehensive error handling -->
     <script>
         // Configuration
         const SUPABASE_CONFIG = {
@@ -272,77 +272,76 @@
         function getUrlParams() {
             const urlParams = new URLSearchParams(window.location.search);
             const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    
+            
             // Debug: Show what we're parsing
             const debugDiv = document.getElementById('debugInfo');
             const url = window.location.href;
-    
+            
             let debugHTML = `
                 <strong>Current URL:</strong><br>
                 ${url}<br><br>
-        
+                
                 <strong>Query Parameters (?param=value):</strong><br>
-           `;
-    
-          if (urlParams.toString()) {
-              for (let [key, value] of urlParams) {
-                  debugHTML += `${key}: ${value}<br>`;
-             }
-         } else {
-              debugHTML += `(none)<br>`;
-         }
-    
-         debugHTML += `<br><strong>Hash Parameters (#param=value):</strong><br>`;
-    
-         if (hashParams.toString()) {
-            for (let [key, value] of hashParams) {
-                debugHTML += `${key}: ${value}<br>`;
+            `;
+            
+            if (urlParams.toString()) {
+                for (let [key, value] of urlParams) {
+                    debugHTML += `${key}: ${value}<br>`;
+                }
+            } else {
+                debugHTML += `(none)<br>`;
             }
-        } else {
-            debugHTML += `(none)<br>`;
-         }
-    
-       // Check for tokens in both places (existing flow)
-       const access_token = urlParams.get('access_token') || hashParams.get('access_token');
-       const refresh_token = urlParams.get('refresh_token') || hashParams.get('refresh_token');
-    
-      // ADDED: Check for Supabase verification parameters
-       const token_hash = urlParams.get('token_hash') || hashParams.get('token_hash');
-       const type = urlParams.get('type') || hashParams.get('type');
-       const next = urlParams.get('next') || hashParams.get('next');
-       const error = urlParams.get('error') || hashParams.get('error');
-       const error_description = urlParams.get('error_description') || hashParams.get('error_description');
-    
-       debugHTML += `<br><strong>Legacy Tokens (Direct):</strong><br>
-        - access_token: ${access_token ? 'FOUND ✅' : 'NOT FOUND ❌'}<br>
-        - refresh_token: ${refresh_token ? 'FOUND ✅' : 'NOT FOUND ❌'}<br>
-        
-        <br><strong>Supabase Verification Parameters:</strong><br>
-        - token_hash: ${token_hash ? 'FOUND ✅' : 'NOT FOUND ❌'}<br>
-        - type: ${type || 'NOT FOUND ❌'}<br>
-        - next: ${next || 'NOT FOUND ❌'}<br>
-        - error: ${error || 'none'}<br>
-        - error_description: ${error_description || 'none'}
-    `;
-    
-    debugDiv.innerHTML = debugHTML;
-    
-    return {
-        // Legacy parameters
-        access_token,
-        refresh_token,
-        expires_at: urlParams.get('expires_at') || hashParams.get('expires_at'),
-        token_type: urlParams.get('token_type') || hashParams.get('token_type'),
-        
-        // ADDED: New Supabase verification parameters
-        token_hash,
-        type,
-        next,
-        error,
-        error_description
-    };
-}
-
+            
+            debugHTML += `<br><strong>Hash Parameters (#param=value):</strong><br>`;
+            
+            if (hashParams.toString()) {
+                for (let [key, value] of hashParams) {
+                    debugHTML += `${key}: ${value}<br>`;
+                }
+            } else {
+                debugHTML += `(none)<br>`;
+            }
+            
+            // Check for tokens in both places (existing flow)
+            const access_token = urlParams.get('access_token') || hashParams.get('access_token');
+            const refresh_token = urlParams.get('refresh_token') || hashParams.get('refresh_token');
+            
+            // ENHANCED: Check for Supabase verification parameters
+            const token_hash = urlParams.get('token_hash') || hashParams.get('token_hash');
+            const type = urlParams.get('type') || hashParams.get('type');
+            const next = urlParams.get('next') || hashParams.get('next');
+            const error = urlParams.get('error') || hashParams.get('error');
+            const error_description = urlParams.get('error_description') || hashParams.get('error_description');
+            
+            debugHTML += `<br><strong>Legacy Tokens (Direct):</strong><br>
+                - access_token: ${access_token ? 'FOUND ✅' : 'NOT FOUND ❌'}<br>
+                - refresh_token: ${refresh_token ? 'FOUND ✅' : 'NOT FOUND ❌'}<br>
+                
+                <br><strong>Supabase Verification Parameters:</strong><br>
+                - token_hash: ${token_hash ? 'FOUND ✅' : 'NOT FOUND ❌'}<br>
+                - type: ${type || 'NOT FOUND ❌'}<br>
+                - next: ${next || 'NOT FOUND ❌'}<br>
+                - error: ${error || 'none'}<br>
+                - error_description: ${error_description || 'none'}
+            `;
+            
+            debugDiv.innerHTML = debugHTML;
+            
+            return {
+                // Legacy parameters
+                access_token,
+                refresh_token,
+                expires_at: urlParams.get('expires_at') || hashParams.get('expires_at'),
+                token_type: urlParams.get('token_type') || hashParams.get('token_type'),
+                
+                // ENHANCED: New Supabase verification parameters
+                token_hash,
+                type,
+                next,
+                error,
+                error_description
+            };
+        }
 
         function setLoading(isLoading) {
             const resetBtn = document.getElementById('resetBtn');
@@ -353,6 +352,112 @@
                 resetBtn.innerHTML = 'Reset Password';
                 resetBtn.disabled = false;
             }
+        }
+
+        // ENHANCED: Supabase client initialization with comprehensive validation
+        function initializeSupabase() {
+            try {
+                if (window.supabase && window.supabase.createClient) {
+                    supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.key);
+                    
+                    // ENHANCED: Validate client configuration
+                    console.log('✅ Supabase client created');
+                    console.log('🔧 Config validation:', {
+                        url: SUPABASE_CONFIG.url,
+                        hasKey: !!SUPABASE_CONFIG.key,
+                        keyLength: SUPABASE_CONFIG.key.length,
+                        keyStart: SUPABASE_CONFIG.key.substring(0, 20) + '...',
+                        clientCreated: !!supabase,
+                        authAvailable: !!(supabase && supabase.auth)
+                    });
+                    
+                    // ENHANCED: Test client with a simple validation
+                    if (supabase.auth) {
+                        console.log('✅ Supabase auth client ready');
+                        return true;
+                    } else {
+                        console.error('❌ Supabase auth not available');
+                        return false;
+                    }
+                } else {
+                    console.error('❌ Supabase not available on window object');
+                    return false;
+                }
+            } catch (error) {
+                console.error('❌ Failed to initialize Supabase:', error);
+                return false;
+            }
+        }
+
+        // ENHANCED: Connection test function
+        async function testSupabaseConnection() {
+            console.log('🔧 Testing Supabase connection...');
+            
+            if (!supabase) {
+                console.error('❌ Supabase client not initialized');
+                return false;
+            }
+
+            try {
+                // Test 1: Check client configuration
+                console.log('🔧 Test 1 - Client configuration:', {
+                    url: SUPABASE_CONFIG.url,
+                    hasKey: !!SUPABASE_CONFIG.key,
+                    keyStart: SUPABASE_CONFIG.key?.substring(0, 20) + '...',
+                    authClient: !!supabase.auth
+                });
+
+                // Test 2: Simple auth status check
+                console.log('🔧 Test 2 - Getting current session...');
+                const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+                
+                console.log('🔧 Session check result:', {
+                    hasSession: !!sessionData?.session,
+                    hasError: !!sessionError,
+                    errorMessage: sessionError?.message
+                });
+
+                if (sessionError && sessionError.message?.includes('API key')) {
+                    console.error('❌ API key issue detected in session check');
+                    return false;
+                }
+
+                console.log('✅ Supabase connection test passed');
+                return true;
+            } catch (error) {
+                console.error('❌ Supabase connection test failed:', error);
+                return false;
+            }
+        }
+
+        // ENHANCED: Direct API call fallback
+        async function verifyOtpDirect(token_hash, type) {
+            console.log('🔧 Attempting direct API call to Supabase...');
+            
+            const response = await fetch(`${SUPABASE_CONFIG.url}/auth/v1/verify`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': SUPABASE_CONFIG.key,
+                    'Authorization': `Bearer ${SUPABASE_CONFIG.key}`
+                },
+                body: JSON.stringify({
+                    token_hash: token_hash,
+                    type: type
+                })
+            });
+
+            console.log('🔧 Direct API response status:', response.status);
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('❌ Direct API error:', errorData);
+                throw new Error(`Direct API call failed: ${response.status} - ${errorData.message || 'Unknown error'}`);
+            }
+
+            const result = await response.json();
+            console.log('✅ Direct API call successful');
+            return result;
         }
 
         // Load Supabase script dynamically with fallbacks
@@ -403,123 +508,175 @@
             });
         }
 
-        // Initialize Supabase
-        function initializeSupabase() {
-            try {
-                if (window.supabase && window.supabase.createClient) {
-                    supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.key);
-                    console.log('✅ Supabase initialized successfully');
-                    return true;
-                } else {
-                    console.error('❌ Supabase not available on window object');
-                    return false;
-                }
-            } catch (error) {
-                console.error('❌ Failed to initialize Supabase:', error);
-                return false;
-            }
-        }
-
-        // Initialize the page
+        // ENHANCED: Initialize the page with comprehensive error handling
         async function initializePage() {
-    const params = getUrlParams();
-    
-    console.log('🔍 URL Parameters found:', params);
-    
-    // Check for Supabase errors first
-    if (params.error) {
-        if (params.error === 'access_denied' && params.error_description?.includes('expired')) {
-            showMessage('❌ The reset link has expired. Please request a new password reset from your app.', 'error');
-        } else {
-            showMessage(`❌ Reset error: ${params.error_description || params.error}. Please request a new password reset.`, 'error');
-        }
-        return;
-    }
-    
-    // ADDED: Handle Supabase verification parameters (New approach)
-    if (params.token_hash && params.type === 'recovery') {
-        console.log('🔄 Processing Supabase verification token...');
-        showMessage('🔄 Verifying reset token...', 'info');
-        
-        try {
-            // Use verifyOtp to exchange token_hash for session
-            const { data, error } = await supabase.auth.verifyOtp({
-                token_hash: params.token_hash,
-                type: 'recovery'
-            });
-
-            if (error) {
-                console.error('❌ Token verification error:', error);
-                throw error;
+            const params = getUrlParams();
+            
+            console.log('🔍 URL Parameters found:', params);
+            
+            // Check for Supabase errors first
+            if (params.error) {
+                if (params.error === 'access_denied' && params.error_description?.includes('expired')) {
+                    showMessage('❌ The reset link has expired. Please request a new password reset from your app.', 'error');
+                } else {
+                    showMessage(`❌ Reset error: ${params.error_description || params.error}. Please request a new password reset.`, 'error');
+                }
+                return;
             }
-
-            if (data?.session) {
-                console.log('✅ Token verification successful, session established');
-                console.log('🔧 Session details:', {
-                    user: data.session.user?.email,
-                    expires_at: new Date(data.session.expires_at * 1000).toISOString()
-                });
+            
+            // ENHANCED: Handle Supabase verification parameters (New approach)
+            if (params.token_hash && params.type === 'recovery') {
+                console.log('🔄 Processing Supabase verification token...');
+                showMessage('🔄 Verifying reset token...', 'info');
                 
-                showMessage('✅ Ready to reset your password!', 'success');
-                
-                // Show the form
-                document.getElementById('resetForm').style.display = 'block';
-                document.getElementById('password').focus();
+                try {
+                    // ENHANCED: Validate Supabase client before API call
+                    if (!supabase) {
+                        throw new Error('Supabase client not initialized');
+                    }
 
-                return; // Exit early, we have a valid session
+                    if (!supabase.auth) {
+                        throw new Error('Supabase auth client not available');
+                    }
+
+                    // ENHANCED: Validate parameters before API call
+                    if (!params.token_hash || params.token_hash.length < 10) {
+                        throw new Error('Invalid or missing token_hash parameter');
+                    }
+
+                    console.log('🔧 Pre-flight validation passed');
+                    console.log('🔧 Calling supabase.auth.verifyOtp with:', {
+                        token_hash: params.token_hash.substring(0, 10) + '...',
+                        type: params.type,
+                        clientReady: !!supabase.auth,
+                        apiUrl: SUPABASE_CONFIG.url,
+                        hasApiKey: !!SUPABASE_CONFIG.key
+                    });
+
+                    // ENHANCED: Try Supabase client first, fallback to direct API
+                    let verifyResult;
+                    try {
+                        const { data, error } = await supabase.auth.verifyOtp({
+                            token_hash: params.token_hash,
+                            type: 'recovery'
+                        });
+
+                        // ENHANCED: Log the raw response for debugging
+                        console.log('🔧 verifyOtp raw response:', { 
+                            hasData: !!data, 
+                            hasError: !!error,
+                            dataKeys: data ? Object.keys(data) : [],
+                            errorMessage: error?.message,
+                            errorDetails: error
+                        });
+
+                        if (error) {
+                            // If client method fails with API key error, try direct method
+                            if (error.message?.includes('API key') || error.message?.includes('apikey')) {
+                                console.log('🔄 Client method failed with API key error, trying direct API...');
+                                verifyResult = await verifyOtpDirect(params.token_hash, 'recovery');
+                            } else {
+                                throw error;
+                            }
+                        } else {
+                            verifyResult = { data, error };
+                        }
+                    } catch (clientError) {
+                        // ENHANCED: Fallback to direct API if client method fails
+                        console.log('🔄 Client method failed, trying direct API call...');
+                        console.error('Client error:', clientError);
+                        
+                        try {
+                            const directResult = await verifyOtpDirect(params.token_hash, 'recovery');
+                            verifyResult = { data: directResult, error: null };
+                        } catch (directError) {
+                            console.error('❌ Both client and direct methods failed');
+                            throw directError;
+                        }
+                    }
+
+                    if (verifyResult.data?.session || verifyResult.data?.user) {
+                        console.log('✅ Token verification successful, session established');
+                        console.log('🔧 Session details:', {
+                            user: verifyResult.data.session?.user?.email || verifyResult.data.user?.email,
+                            hasSession: !!verifyResult.data.session,
+                            hasUser: !!verifyResult.data.user
+                        });
+                        
+                        showMessage('✅ Ready to reset your password!', 'success');
+                        
+                        // Show the form
+                        document.getElementById('resetForm').style.display = 'block';
+                        document.getElementById('password').focus();
+
+                        return; // Exit early, we have a valid session
+                    } else {
+                        throw new Error('No session or user returned from token verification');
+                    }
+                } catch (error) {
+                    console.error('❌ Token verification failed:', error);
+                    
+                    // ENHANCED: More specific error messages
+                    if (error.message?.includes('expired')) {
+                        showMessage('❌ The reset token has expired. Please request a new password reset from your app.', 'error');
+                    } else if (error.message?.includes('invalid')) {
+                        showMessage('❌ Invalid reset token. Please request a new password reset from your app.', 'error');
+                    } else if (error.message?.includes('API key')) {
+                        showMessage('❌ Authentication configuration error. Please contact support.', 'error');
+                    } else {
+                        showMessage(`❌ Token verification failed: ${error.message}. Please request a new password reset from your app.`, 'error');
+                    }
+                    return;
+                }
+            }
+            
+            // ENHANCED: Existing access_token handling as fallback for legacy flow
+            if (params.access_token) {
+                console.log('🔄 Using legacy access_token flow...');
+                
+                if (params.type && params.type !== 'recovery') {
+                    showMessage(`❌ Wrong link type: ${params.type}. Expected 'recovery'.`, 'error');
+                    return;
+                }
+
+                if (!supabase) {
+                    showMessage('Authentication system not ready. Please refresh the page.', 'error');
+                    return;
+                }
+
+                try {
+                    console.log('🔄 Setting session with legacy tokens...');
+                    
+                    const sessionData = {
+                        access_token: params.access_token,
+                        refresh_token: params.refresh_token || ''
+                    };
+                    
+                    const { data, error } = await supabase.auth.setSession(sessionData);
+
+                    if (error) {
+                        throw error;
+                    }
+
+                    console.log('✅ Legacy session set successfully');
+                    showMessage('✅ Ready to reset your password!', 'success');
+                    
+                    // Show the form
+                    document.getElementById('resetForm').style.display = 'block';
+                    document.getElementById('password').focus();
+
+                } catch (error) {
+                    console.error('❌ Legacy session error:', error);
+                    showMessage(`Session error: ${error.message}. Please request a new password reset.`, 'error');
+                }
             } else {
-                throw new Error('No session returned from token verification');
+                // ENHANCED: Better error message
+                showMessage('❌ No valid reset parameters found in URL. This usually means:<br>• The reset link has expired<br>• You refreshed the page<br>• The link was malformed<br><br>Please request a new password reset from your app.', 'error');
+                
+                // Additional debug info
+                console.log('❌ No valid parameters found. Available params:', params);
             }
-        } catch (error) {
-            console.error('❌ Token verification failed:', error);
-            showMessage(`Token verification failed: ${error.message}. Please request a new password reset from your app.`, 'error');
-            return;
         }
-    }
-    
-    // KEPT: Existing access_token handling as fallback for legacy flow
-    if (params.access_token) {
-        if (params.type && params.type !== 'recovery') {
-            showMessage(`❌ Wrong link type: ${params.type}. Expected 'recovery'.`, 'error');
-            return;
-        }
-
-        if (!supabase) {
-            showMessage('Authentication system not ready. Please refresh the page.', 'error');
-            return;
-        }
-
-        try {
-            console.log('🔄 Setting session with legacy tokens...');
-            
-            const sessionData = {
-                access_token: params.access_token,
-                refresh_token: params.refresh_token || ''
-            };
-            
-            const { data, error } = await supabase.auth.setSession(sessionData);
-
-            if (error) {
-                throw error;
-            }
-
-            console.log('✅ Legacy session set successfully');
-            showMessage('✅ Ready to reset your password!', 'success');
-            
-            // Show the form
-            document.getElementById('resetForm').style.display = 'block';
-            document.getElementById('password').focus();
-
-        } catch (error) {
-            console.error('❌ Legacy session error:', error);
-            showMessage(`Session error: ${error.message}. Please request a new password reset.`, 'error');
-        }
-    } else {
-        // UPDATED: Better error message
-        showMessage('❌ No valid reset parameters found in URL. This usually means:<br>• The reset link has expired<br>• You refreshed the page<br>• The link was malformed<br><br>Please request a new password reset from your app.', 'error');
-    }
-}
-
 
         // Handle password reset
         async function handlePasswordReset() {
@@ -562,9 +719,22 @@
                 document.getElementById('password').value = '';
                 document.getElementById('confirmPassword').value = '';
                 
-                // Redirect after success
+                // Redirect after success with mobile detection
                 setTimeout(() => {
-                    window.location.href = 'https://ninet.io';
+                    // Check if mobile app is available
+                    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                    
+                    if (isMobile) {
+                        // Try to open mobile app
+                        window.location.href = 'ninet://auth/password-reset-success';
+                        
+                        // Fallback to website after 2 seconds if app doesn't open
+                        setTimeout(() => {
+                            window.location.href = 'https://ninet.io';
+                        }, 2000);
+                    } else {
+                        window.location.href = 'https://ninet.io';
+                    }
                 }, 3000);
 
             } catch (error) {
@@ -579,9 +749,9 @@
             }
         }
 
-        // Initialize when page loads
+        // ENHANCED: Initialize when page loads
         window.addEventListener('load', async function() {
-            console.log('🚀 Initializing password reset page...');
+            console.log('🚀 Initializing enhanced password reset page...');
             
             // Show debug info immediately
             getUrlParams();
@@ -598,10 +768,19 @@
                 if (supabaseReady) {
                     showMessage('Authentication system loaded successfully!', 'success');
                     
-                    // Wait a moment then initialize page
-                    setTimeout(() => {
-                        initializePage();
-                    }, 500);
+                    // ENHANCED: Test connection before proceeding
+                    const connectionTest = await testSupabaseConnection();
+                    
+                    if (connectionTest) {
+                        showMessage('✅ Supabase connection verified, proceeding...', 'success');
+                        
+                        // Wait a moment then initialize page
+                        setTimeout(() => {
+                            initializePage();
+                        }, 500);
+                    } else {
+                        showMessage('❌ Supabase connection failed. Please check configuration and try again.', 'error');
+                    }
                     
                     // Setup button click handler
                     document.getElementById('resetBtn').addEventListener('click', handlePasswordReset);
