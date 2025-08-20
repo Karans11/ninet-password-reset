@@ -422,61 +422,104 @@
 
         // Initialize the page
         async function initializePage() {
-            const params = getUrlParams();
-            
-            console.log('🔍 URL Parameters found:', params);
-            
-            // Check for Supabase errors first
-            if (params.error) {
-                if (params.error === 'access_denied' && params.error_description?.includes('expired')) {
-                    showMessage('❌ The reset link has expired. Please request a new password reset from your app.', 'error');
-                } else {
-                    showMessage(`❌ Reset error: ${params.error_description || params.error}. Please request a new password reset.`, 'error');
-                }
-                return;
-            }
-            
-            if (!params.access_token) {
-                showMessage('❌ No access_token found in URL. This usually means:<br>• The reset link has expired<br>• You refreshed the page<br>• The link was malformed<br><br>Please request a new password reset from your app.', 'error');
-                return;
-            }
-            
-            if (params.type && params.type !== 'recovery') {
-                showMessage(`❌ Wrong link type: ${params.type}. Expected 'recovery'.`, 'error');
-                return;
+    const params = getUrlParams();
+    
+    console.log('🔍 URL Parameters found:', params);
+    
+    // Check for Supabase errors first
+    if (params.error) {
+        if (params.error === 'access_denied' && params.error_description?.includes('expired')) {
+            showMessage('❌ The reset link has expired. Please request a new password reset from your app.', 'error');
+        } else {
+            showMessage(`❌ Reset error: ${params.error_description || params.error}. Please request a new password reset.`, 'error');
+        }
+        return;
+    }
+    
+    // ADDED: Handle Supabase verification parameters (New approach)
+    if (params.token_hash && params.type === 'recovery') {
+        console.log('🔄 Processing Supabase verification token...');
+        showMessage('🔄 Verifying reset token...', 'info');
+        
+        try {
+            // Use verifyOtp to exchange token_hash for session
+            const { data, error } = await supabase.auth.verifyOtp({
+                token_hash: params.token_hash,
+                type: 'recovery'
+            });
+
+            if (error) {
+                console.error('❌ Token verification error:', error);
+                throw error;
             }
 
-            if (!supabase) {
-                showMessage('Authentication system not ready. Please refresh the page.', 'error');
-                return;
-            }
-
-            try {
-                console.log('🔄 Setting session with tokens...');
+            if (data?.session) {
+                console.log('✅ Token verification successful, session established');
+                console.log('🔧 Session details:', {
+                    user: data.session.user?.email,
+                    expires_at: new Date(data.session.expires_at * 1000).toISOString()
+                });
                 
-                const sessionData = {
-                    access_token: params.access_token,
-                    refresh_token: params.refresh_token || ''
-                };
-                
-                const { data, error } = await supabase.auth.setSession(sessionData);
-
-                if (error) {
-                    throw error;
-                }
-
-                console.log('✅ Session set successfully');
                 showMessage('✅ Ready to reset your password!', 'success');
                 
                 // Show the form
                 document.getElementById('resetForm').style.display = 'block';
                 document.getElementById('password').focus();
 
-            } catch (error) {
-                console.error('❌ Session error:', error);
-                showMessage(`Session error: ${error.message}. Please request a new password reset.`, 'error');
+                return; // Exit early, we have a valid session
+            } else {
+                throw new Error('No session returned from token verification');
             }
+        } catch (error) {
+            console.error('❌ Token verification failed:', error);
+            showMessage(`Token verification failed: ${error.message}. Please request a new password reset from your app.`, 'error');
+            return;
         }
+    }
+    
+    // KEPT: Existing access_token handling as fallback for legacy flow
+    if (params.access_token) {
+        if (params.type && params.type !== 'recovery') {
+            showMessage(`❌ Wrong link type: ${params.type}. Expected 'recovery'.`, 'error');
+            return;
+        }
+
+        if (!supabase) {
+            showMessage('Authentication system not ready. Please refresh the page.', 'error');
+            return;
+        }
+
+        try {
+            console.log('🔄 Setting session with legacy tokens...');
+            
+            const sessionData = {
+                access_token: params.access_token,
+                refresh_token: params.refresh_token || ''
+            };
+            
+            const { data, error } = await supabase.auth.setSession(sessionData);
+
+            if (error) {
+                throw error;
+            }
+
+            console.log('✅ Legacy session set successfully');
+            showMessage('✅ Ready to reset your password!', 'success');
+            
+            // Show the form
+            document.getElementById('resetForm').style.display = 'block';
+            document.getElementById('password').focus();
+
+        } catch (error) {
+            console.error('❌ Legacy session error:', error);
+            showMessage(`Session error: ${error.message}. Please request a new password reset.`, 'error');
+        }
+    } else {
+        // UPDATED: Better error message
+        showMessage('❌ No valid reset parameters found in URL. This usually means:<br>• The reset link has expired<br>• You refreshed the page<br>• The link was malformed<br><br>Please request a new password reset from your app.', 'error');
+    }
+}
+
 
         // Handle password reset
         async function handlePasswordReset() {
