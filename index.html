@@ -4,705 +4,266 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reset Password - NineT</title>
-    <meta name="description" content="Reset your NineT password securely">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            line-height: 1.5;
-            overflow-x: hidden;
-            position: relative;
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            line-height: 1.6;
         }
-        
-        #particles {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            background: transparent;
-        }
-        
+
         .container {
-            max-width: 400px;
-            width: 90%;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            padding: 40px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            position: relative;
-            z-index: 2;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        
-        .logo {
-            width: 60px;
-            height: 60px;
-            background: #1D4ED8;
-            border-radius: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 24px;
-            font-size: 24px;
-            font-weight: bold;
-            color: white;
-        }
-        
+
         h1 {
+            color: #333;
             text-align: center;
-            margin-bottom: 8px;
-            font-size: 24px;
-            font-weight: 600;
+            margin-bottom: 30px;
         }
-        
-        .subtitle {
-            text-align: center;
-            color: #9CA3AF;
-            margin-bottom: 32px;
-            font-size: 14px;
-        }
-        
-        .form-group {
+
+        .status {
+            padding: 15px;
+            border-radius: 4px;
             margin-bottom: 20px;
+            text-align: center;
         }
-        
+
+        .loading {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            border: 1px solid #bbdefb;
+        }
+
+        .error {
+            background-color: #ffebee;
+            color: #d32f2f;
+            border: 1px solid #ffcdd2;
+        }
+
+        .success {
+            background-color: #e8f5e8;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+
         label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            font-size: 14px;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
         }
-        
-        input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 16px;
-            transition: border-color 0.2s;
-        }
-        
-        input:focus {
-            outline: none;
-            border-color: #60A5FA;
-        }
-        
-        input::placeholder {
-            color: #6B7280;
-        }
-        
-        .btn {
+
+        input[type="password"] {
             width: 100%;
             padding: 12px;
-            background: #1D4ED8;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
             color: white;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
+            border-radius: 4px;
             cursor: pointer;
-            transition: background-color 0.2s;
-            margin-bottom: 16px;
+            font-size: 16px;
+            font-weight: bold;
         }
-        
-        .btn:hover:not(:disabled) {
-            background: #1E40AF;
+
+        button:hover {
+            background-color: #0056b3;
         }
-        
-        .btn:disabled {
-            background: #374151;
+
+        button:disabled {
+            background-color: #6c757d;
             cursor: not-allowed;
-            opacity: 0.7;
         }
-        
-        .message {
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            text-align: center;
-        }
-        
-        .success {
-            background: rgba(16, 185, 129, 0.2);
-            border: 1px solid #10B981;
-            color: #10B981;
-        }
-        
-        .error {
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid #EF4444;
-            color: #EF4444;
-        }
-        
-        .info {
-            background: rgba(59, 130, 246, 0.2);
-            border: 1px solid #3B82F6;
-            color: #60A5FA;
-        }
-        
+
         .back-link {
             text-align: center;
-            margin-top: 24px;
+            margin-top: 20px;
         }
-        
+
         .back-link a {
-            color: #60A5FA;
+            color: #007bff;
             text-decoration: none;
-            font-size: 14px;
         }
-        
+
         .back-link a:hover {
             text-decoration: underline;
         }
-        
-        .loading {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top: 2px solid #ffffff;
-            animation: spin 1s linear infinite;
-            margin-right: 8px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .footer {
-            text-align: center;
-            margin-top: 32px;
-            padding-top: 24px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: #6B7280;
+
+        .debug {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
             font-size: 12px;
+            margin-top: 20px;
+            color: #6c757d;
         }
     </style>
 </head>
 <body>
-    <div id="particles"></div>
     <div class="container">
-        <div class="logo">N</div>
-        <h1>Reset Password (Enhanced Debug)</h1>
-        <p class="subtitle">Enhanced debugging with API key validation</p>
+        <h1>Reset Password</h1>
         
-        <div id="message"></div>
-        
-        <!-- DEBUG SECTION -->
-        <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid #3B82F6; border-radius: 8px; padding: 16px; margin-bottom: 24px; font-family: monospace; font-size: 12px; max-height: 200px; overflow-y: auto;">
-            <div style="color: #60A5FA; font-weight: bold; margin-bottom: 8px;">🔍 URL DEBUG INFO:</div>
-            <div id="debugInfo">Loading URL parameters...</div>
+        <!-- Status messages -->
+        <div id="loading" class="status loading">
+            Checking reset session...
         </div>
         
+        <div id="error" class="status error" style="display: none;">
+            <!-- Error messages will appear here -->
+        </div>
+        
+        <div id="success" class="status success" style="display: none;">
+            <!-- Success messages will appear here -->
+        </div>
+        
+        <!-- Password reset form (hidden initially) -->
         <div id="resetForm" style="display: none;">
-            <div class="form-group">
-                <label for="password">New Password</label>
+            <form onsubmit="updatePassword(); return false;">
+                <label for="password">New Password:</label>
                 <input 
                     type="password" 
                     id="password" 
-                    name="password" 
+                    placeholder="Enter your new password"
                     required 
                     minlength="6"
-                    placeholder="Enter your new password"
                 >
-            </div>
-            
-            <div class="form-group">
-                <label for="confirmPassword">Confirm Password</label>
+                
+                <label for="confirmPassword">Confirm Password:</label>
                 <input 
                     type="password" 
                     id="confirmPassword" 
-                    name="confirmPassword" 
+                    placeholder="Confirm your new password"
                     required 
                     minlength="6"
-                    placeholder="Confirm your new password"
                 >
-            </div>
-            
-            <button type="button" id="resetBtn" class="btn">
-                Reset Password
-            </button>
+                
+                <button type="submit" id="updateBtn">
+                    Update Password
+                </button>
+            </form>
         </div>
         
         <div class="back-link">
             <a href="https://ninet.io">← Back to NineT</a>
         </div>
-        
-        <div class="footer">
-            <p>© 2025 NineT. Enhanced debug mode with API validation.</p>
+
+        <!-- Debug info (can be removed in production) -->
+        <div id="debug" class="debug">
+            <strong>Debug Info:</strong><br>
+            <span id="debugContent">Initializing...</span>
         </div>
     </div>
 
-    <!-- Enhanced Supabase integration with comprehensive error handling -->
+    <!-- Supabase JS SDK -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2.52.1/dist/umd/supabase.js"></script>
+    
     <script>
-        // Configuration
+        // Supabase configuration
         const SUPABASE_CONFIG = {
             url: 'https://khpnsigvensxkxdntgqz.supabase.co',
             key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtocG5zaWd2ZW5zeGt4ZG50Z3F6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI2NzQ2MDQsImV4cCI6MjA2ODI1MDYwNH0.3HAuhNTsKk6CzmhJ2X3tVgpP_BaRdXhFIwq3DxeCBVs'
         };
 
-        // Global variables
-        let supabase = null;
-        
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.key);
+
         // Utility functions
-        function showMessage(text, type = 'info') {
-            const messageDiv = document.getElementById('message');
-            messageDiv.innerHTML = `<div class="message ${type}">${text}</div>`;
+        function showStatus(type, message) {
+            // Hide all status divs
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('success').style.display = 'none';
+            
+            // Show the requested status
+            const statusDiv = document.getElementById(type);
+            statusDiv.innerHTML = message;
+            statusDiv.style.display = 'block';
         }
 
-        function getUrlParams() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const hashParams = new URLSearchParams(window.location.hash.substring(1));
-            
-            // Debug: Show what we're parsing
-            const debugDiv = document.getElementById('debugInfo');
-            const url = window.location.href;
-            
-            let debugHTML = `
-                <strong>Current URL:</strong><br>
-                ${url}<br><br>
-                
-                <strong>Query Parameters (?param=value):</strong><br>
-            `;
-            
-            if (urlParams.toString()) {
-                for (let [key, value] of urlParams) {
-                    debugHTML += `${key}: ${value}<br>`;
-                }
-            } else {
-                debugHTML += `(none)<br>`;
-            }
-            
-            debugHTML += `<br><strong>Hash Parameters (#param=value):</strong><br>`;
-            
-            if (hashParams.toString()) {
-                for (let [key, value] of hashParams) {
-                    debugHTML += `${key}: ${value}<br>`;
-                }
-            } else {
-                debugHTML += `(none)<br>`;
-            }
-            
-            // Check for tokens in both places (existing flow)
-            const access_token = urlParams.get('access_token') || hashParams.get('access_token');
-            const refresh_token = urlParams.get('refresh_token') || hashParams.get('refresh_token');
-            
-            // ENHANCED: Check for Supabase verification parameters
-            const token_hash = urlParams.get('token_hash') || hashParams.get('token_hash');
-            const type = urlParams.get('type') || hashParams.get('type');
-            const next = urlParams.get('next') || hashParams.get('next');
-            const error = urlParams.get('error') || hashParams.get('error');
-            const error_description = urlParams.get('error_description') || hashParams.get('error_description');
-            
-            debugHTML += `<br><strong>Legacy Tokens (Direct):</strong><br>
-                - access_token: ${access_token ? 'FOUND ✅' : 'NOT FOUND ❌'}<br>
-                - refresh_token: ${refresh_token ? 'FOUND ✅' : 'NOT FOUND ❌'}<br>
-                
-                <br><strong>Supabase Verification Parameters:</strong><br>
-                - token_hash: ${token_hash ? 'FOUND ✅' : 'NOT FOUND ❌'}<br>
-                - type: ${type || 'NOT FOUND ❌'}<br>
-                - next: ${next || 'NOT FOUND ❌'}<br>
-                - error: ${error || 'none'}<br>
-                - error_description: ${error_description || 'none'}
-            `;
-            
-            debugDiv.innerHTML = debugHTML;
-            
-            return {
-                // Legacy parameters
-                access_token,
-                refresh_token,
-                expires_at: urlParams.get('expires_at') || hashParams.get('expires_at'),
-                token_type: urlParams.get('token_type') || hashParams.get('token_type'),
-                
-                // ENHANCED: New Supabase verification parameters
-                token_hash,
-                type,
-                next,
-                error,
-                error_description
-            };
+        function updateDebug(message) {
+            document.getElementById('debugContent').innerHTML = message;
         }
 
-        function setLoading(isLoading) {
-            const resetBtn = document.getElementById('resetBtn');
-            if (isLoading) {
-                resetBtn.innerHTML = '<div class="loading"></div>Resetting Password...';
-                resetBtn.disabled = true;
-            } else {
-                resetBtn.innerHTML = 'Reset Password';
-                resetBtn.disabled = false;
-            }
-        }
-
-        // ENHANCED: Supabase client initialization with comprehensive validation
-        function initializeSupabase() {
+        // Check for existing session
+        async function checkSession() {
             try {
-                if (window.supabase && window.supabase.createClient) {
-                    supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.key);
-                    
-                    // ENHANCED: Validate client configuration
-                    console.log('✅ Supabase client created');
-                    console.log('🔧 Config validation:', {
-                        url: SUPABASE_CONFIG.url,
-                        hasKey: !!SUPABASE_CONFIG.key,
-                        keyLength: SUPABASE_CONFIG.key.length,
-                        keyStart: SUPABASE_CONFIG.key.substring(0, 20) + '...',
-                        clientCreated: !!supabase,
-                        authAvailable: !!(supabase && supabase.auth)
-                    });
-                    
-                    // ENHANCED: Test client with a simple validation
-                    if (supabase.auth) {
-                        console.log('✅ Supabase auth client ready');
-                        return true;
-                    } else {
-                        console.error('❌ Supabase auth not available');
-                        return false;
-                    }
-                } else {
-                    console.error('❌ Supabase not available on window object');
+                updateDebug('Checking for Supabase session...');
+                
+                const { data: { session }, error } = await supabase.auth.getSession();
+                
+                updateDebug(`Session check complete. Session found: ${!!session}, Error: ${error?.message || 'none'}`);
+                
+                if (error) {
+                    console.error('Session check error:', error);
+                    showStatus('error', `Session error: ${error.message}`);
                     return false;
                 }
-            } catch (error) {
-                console.error('❌ Failed to initialize Supabase:', error);
-                return false;
-            }
-        }
-
-        // ENHANCED: Connection test function
-        async function testSupabaseConnection() {
-            console.log('🔧 Testing Supabase connection...');
-            
-            if (!supabase) {
-                console.error('❌ Supabase client not initialized');
-                return false;
-            }
-
-            try {
-                // Test 1: Check client configuration
-                console.log('🔧 Test 1 - Client configuration:', {
-                    url: SUPABASE_CONFIG.url,
-                    hasKey: !!SUPABASE_CONFIG.key,
-                    keyStart: SUPABASE_CONFIG.key?.substring(0, 20) + '...',
-                    authClient: !!supabase.auth
-                });
-
-                // Test 2: Simple auth status check
-                console.log('🔧 Test 2 - Getting current session...');
-                const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
                 
-                console.log('🔧 Session check result:', {
-                    hasSession: !!sessionData?.session,
-                    hasError: !!sessionError,
-                    errorMessage: sessionError?.message
-                });
-
-                if (sessionError && sessionError.message?.includes('API key')) {
-                    console.error('❌ API key issue detected in session check');
-                    return false;
-                }
-
-                console.log('✅ Supabase connection test passed');
-                return true;
-            } catch (error) {
-                console.error('❌ Supabase connection test failed:', error);
-                return false;
-            }
-        }
-
-        // ENHANCED: Direct API call fallback
-        async function verifyOtpDirect(token_hash, type) {
-            console.log('🔧 Attempting direct API call to Supabase...');
-            
-            const response = await fetch(`${SUPABASE_CONFIG.url}/auth/v1/verify`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'apikey': SUPABASE_CONFIG.key,
-                    'Authorization': `Bearer ${SUPABASE_CONFIG.key}`
-                },
-                body: JSON.stringify({
-                    token_hash: token_hash,
-                    type: type
-                })
-            });
-
-            console.log('🔧 Direct API response status:', response.status);
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error('❌ Direct API error:', errorData);
-                throw new Error(`Direct API call failed: ${response.status} - ${errorData.message || 'Unknown error'}`);
-            }
-
-            const result = await response.json();
-            console.log('✅ Direct API call successful');
-            return result;
-        }
-
-        // Load Supabase script dynamically with fallbacks
-        async function loadSupabaseScript() {
-            return new Promise((resolve, reject) => {
-                // Try multiple CDN sources
-                const cdnUrls = [
-                    'https://unpkg.com/@supabase/supabase-js@2.52.1/dist/umd/supabase.js',
-                    'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.52.1/dist/umd/supabase.js'
-                ];
-
-                let attemptCount = 0;
-
-                function tryLoadScript() {
-                    if (attemptCount >= cdnUrls.length) {
-                        reject(new Error('All CDN sources failed'));
-                        return;
-                    }
-
-                    const script = document.createElement('script');
-                    script.src = cdnUrls[attemptCount];
-                    
-                    script.onload = function() {
-                        console.log(`✅ Supabase script loaded from: ${cdnUrls[attemptCount]}`);
-                        
-                        // Wait a bit for the script to be fully available
-                        setTimeout(() => {
-                            if (window.supabase && window.supabase.createClient) {
-                                resolve();
-                            } else {
-                                console.warn(`Script loaded but supabase not available, trying next CDN...`);
-                                attemptCount++;
-                                tryLoadScript();
-                            }
-                        }, 100);
-                    };
-                    
-                    script.onerror = function() {
-                        console.warn(`Failed to load from: ${cdnUrls[attemptCount]}`);
-                        attemptCount++;
-                        tryLoadScript();
-                    };
-
-                    document.head.appendChild(script);
-                }
-
-                tryLoadScript();
-            });
-        }
-
-        // ENHANCED: Initialize the page with comprehensive error handling
-        async function initializePage() {
-            const params = getUrlParams();
-            
-            console.log('🔍 URL Parameters found:', params);
-            
-            // Check for Supabase errors first
-            if (params.error) {
-                if (params.error === 'access_denied' && params.error_description?.includes('expired')) {
-                    showMessage('❌ The reset link has expired. Please request a new password reset from your app.', 'error');
-                } else {
-                    showMessage(`❌ Reset error: ${params.error_description || params.error}. Please request a new password reset.`, 'error');
-                }
-                return;
-            }
-            
-            // ENHANCED: Handle Supabase verification parameters (New approach)
-            if (params.token_hash && params.type === 'recovery') {
-                console.log('🔄 Processing Supabase verification token...');
-                showMessage('🔄 Verifying reset token...', 'info');
-                
-                try {
-                    // ENHANCED: Validate Supabase client before API call
-                    if (!supabase) {
-                        throw new Error('Supabase client not initialized');
-                    }
-
-                    if (!supabase.auth) {
-                        throw new Error('Supabase auth client not available');
-                    }
-
-                    // ENHANCED: Validate parameters before API call
-                    if (!params.token_hash || params.token_hash.length < 10) {
-                        throw new Error('Invalid or missing token_hash parameter');
-                    }
-
-                    console.log('🔧 Pre-flight validation passed');
-                    console.log('🔧 Calling supabase.auth.verifyOtp with:', {
-                        token_hash: params.token_hash.substring(0, 10) + '...',
-                        type: params.type,
-                        clientReady: !!supabase.auth,
-                        apiUrl: SUPABASE_CONFIG.url,
-                        hasApiKey: !!SUPABASE_CONFIG.key
-                    });
-
-                    // ENHANCED: Try Supabase client first, fallback to direct API
-                    let verifyResult;
-                    try {
-                        const { data, error } = await supabase.auth.verifyOtp({
-                            token_hash: params.token_hash,
-                            type: 'recovery'
-                        });
-
-                        // ENHANCED: Log the raw response for debugging
-                        console.log('🔧 verifyOtp raw response:', { 
-                            hasData: !!data, 
-                            hasError: !!error,
-                            dataKeys: data ? Object.keys(data) : [],
-                            errorMessage: error?.message,
-                            errorDetails: error
-                        });
-
-                        if (error) {
-                            // If client method fails with API key error, try direct method
-                            if (error.message?.includes('API key') || error.message?.includes('apikey')) {
-                                console.log('🔄 Client method failed with API key error, trying direct API...');
-                                verifyResult = await verifyOtpDirect(params.token_hash, 'recovery');
-                            } else {
-                                throw error;
-                            }
-                        } else {
-                            verifyResult = { data, error };
-                        }
-                    } catch (clientError) {
-                        // ENHANCED: Fallback to direct API if client method fails
-                        console.log('🔄 Client method failed, trying direct API call...');
-                        console.error('Client error:', clientError);
-                        
-                        try {
-                            const directResult = await verifyOtpDirect(params.token_hash, 'recovery');
-                            verifyResult = { data: directResult, error: null };
-                        } catch (directError) {
-                            console.error('❌ Both client and direct methods failed');
-                            throw directError;
-                        }
-                    }
-
-                    if (verifyResult.data?.session || verifyResult.data?.user) {
-                        console.log('✅ Token verification successful, session established');
-                        console.log('🔧 Session details:', {
-                            user: verifyResult.data.session?.user?.email || verifyResult.data.user?.email,
-                            hasSession: !!verifyResult.data.session,
-                            hasUser: !!verifyResult.data.user
-                        });
-                        
-                        showMessage('✅ Ready to reset your password!', 'success');
-                        
-                        // Show the form
-                        document.getElementById('resetForm').style.display = 'block';
-                        document.getElementById('password').focus();
-
-                        return; // Exit early, we have a valid session
-                    } else {
-                        throw new Error('No session or user returned from token verification');
-                    }
-                } catch (error) {
-                    console.error('❌ Token verification failed:', error);
-                    
-                    // ENHANCED: More specific error messages
-                    if (error.message?.includes('expired')) {
-                        showMessage('❌ The reset token has expired. Please request a new password reset from your app.', 'error');
-                    } else if (error.message?.includes('invalid')) {
-                        showMessage('❌ Invalid reset token. Please request a new password reset from your app.', 'error');
-                    } else if (error.message?.includes('API key')) {
-                        showMessage('❌ Authentication configuration error. Please contact support.', 'error');
-                    } else {
-                        showMessage(`❌ Token verification failed: ${error.message}. Please request a new password reset from your app.`, 'error');
-                    }
-                    return;
-                }
-            }
-            
-            // ENHANCED: Existing access_token handling as fallback for legacy flow
-            if (params.access_token) {
-                console.log('🔄 Using legacy access_token flow...');
-                
-                if (params.type && params.type !== 'recovery') {
-                    showMessage(`❌ Wrong link type: ${params.type}. Expected 'recovery'.`, 'error');
-                    return;
-                }
-
-                if (!supabase) {
-                    showMessage('Authentication system not ready. Please refresh the page.', 'error');
-                    return;
-                }
-
-                try {
-                    console.log('🔄 Setting session with legacy tokens...');
-                    
-                    const sessionData = {
-                        access_token: params.access_token,
-                        refresh_token: params.refresh_token || ''
-                    };
-                    
-                    const { data, error } = await supabase.auth.setSession(sessionData);
-
-                    if (error) {
-                        throw error;
-                    }
-
-                    console.log('✅ Legacy session set successfully');
-                    showMessage('✅ Ready to reset your password!', 'success');
-                    
-                    // Show the form
+                if (session) {
+                    console.log('✅ Session found:', session.user?.email);
+                    showStatus('success', 'Reset session verified! Enter your new password below.');
                     document.getElementById('resetForm').style.display = 'block';
                     document.getElementById('password').focus();
-
-                } catch (error) {
-                    console.error('❌ Legacy session error:', error);
-                    showMessage(`Session error: ${error.message}. Please request a new password reset.`, 'error');
+                    return true;
+                } else {
+                    console.log('❌ No session found');
+                    showStatus('error', 'No reset session found. Please click the password reset link from your email again.');
+                    return false;
                 }
-            } else {
-                // ENHANCED: Better error message
-                showMessage('❌ No valid reset parameters found in URL. This usually means:<br>• The reset link has expired<br>• You refreshed the page<br>• The link was malformed<br><br>Please request a new password reset from your app.', 'error');
-                
-                // Additional debug info
-                console.log('❌ No valid parameters found. Available params:', params);
+            } catch (error) {
+                console.error('Session check failed:', error);
+                updateDebug(`Session check failed: ${error.message}`);
+                showStatus('error', `Failed to check session: ${error.message}`);
+                return false;
             }
         }
 
-        // Handle password reset
-        async function handlePasswordReset() {
-            if (!supabase) {
-                showMessage('Authentication system not ready. Please refresh the page.', 'error');
-                return;
-            }
-            
+        // Update password function
+        async function updatePassword() {
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
+            const updateBtn = document.getElementById('updateBtn');
 
             // Validation
             if (password.length < 6) {
-                showMessage('Password must be at least 6 characters long.', 'error');
+                showStatus('error', 'Password must be at least 6 characters long.');
                 return;
             }
 
             if (password !== confirmPassword) {
-                showMessage('Passwords do not match. Please check and try again.', 'error');
+                showStatus('error', 'Passwords do not match. Please check and try again.');
                 return;
             }
 
-            setLoading(true);
+            // Disable button and show loading
+            updateBtn.disabled = true;
+            updateBtn.innerHTML = 'Updating...';
+            showStatus('loading', 'Updating your password...');
 
             try {
-                console.log('🔄 Updating password...');
+                updateDebug('Calling supabase.auth.updateUser...');
                 
                 const { data, error } = await supabase.auth.updateUser({
                     password: password
@@ -713,22 +274,23 @@
                 }
 
                 console.log('✅ Password updated successfully');
-                showMessage('🎉 Password reset successfully! You can now sign in with your new password.', 'success');
+                updateDebug('Password update successful!');
+                showStatus('success', '🎉 Password updated successfully! Redirecting...');
                 
                 // Clear form
                 document.getElementById('password').value = '';
                 document.getElementById('confirmPassword').value = '';
                 
-                // Redirect after success with mobile detection
+                // Redirect after success
                 setTimeout(() => {
-                    // Check if mobile app is available
+                    // Check if mobile device
                     const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
                     
                     if (isMobile) {
-                        // Try to open mobile app
+                        // Try to open mobile app first
                         window.location.href = 'ninet://auth/password-reset-success';
                         
-                        // Fallback to website after 2 seconds if app doesn't open
+                        // Fallback to website after 2 seconds
                         setTimeout(() => {
                             window.location.href = 'https://ninet.io';
                         }, 2000);
@@ -738,93 +300,54 @@
                 }, 3000);
 
             } catch (error) {
-                console.error('❌ Password reset error:', error);
-                setLoading(false);
+                console.error('❌ Password update failed:', error);
+                updateDebug(`Password update failed: ${error.message}`);
                 
+                // Re-enable button
+                updateBtn.disabled = false;
+                updateBtn.innerHTML = 'Update Password';
+                
+                // Show specific error messages
                 if (error.message.includes('session')) {
-                    showMessage('Your reset session has expired. Please request a new password reset.', 'error');
+                    showStatus('error', 'Your reset session has expired. Please request a new password reset from the app.');
+                } else if (error.message.includes('same password')) {
+                    showStatus('error', 'New password must be different from your current password.');
                 } else {
-                    showMessage(`Reset failed: ${error.message}`, 'error');
+                    showStatus('error', `Update failed: ${error.message}`);
                 }
             }
         }
 
-        // ENHANCED: Initialize when page loads
-        window.addEventListener('load', async function() {
-            console.log('🚀 Initializing enhanced password reset page...');
+        // Initialize when page loads
+        window.addEventListener('load', function() {
+            console.log('🚀 Password reset page loaded');
+            updateDebug('Page loaded, initializing...');
             
-            // Show debug info immediately
-            getUrlParams();
-            
-            showMessage('Loading authentication system...', 'info');
-            
-            try {
-                // Load Supabase script first
-                await loadSupabaseScript();
-                
-                // Then initialize Supabase
-                const supabaseReady = initializeSupabase();
-                
-                if (supabaseReady) {
-                    showMessage('Authentication system loaded successfully!', 'success');
-                    
-                    // ENHANCED: Test connection before proceeding
-                    const connectionTest = await testSupabaseConnection();
-                    
-                    if (connectionTest) {
-                        showMessage('✅ Supabase connection verified, proceeding...', 'success');
-                        
-                        // Wait a moment then initialize page
-                        setTimeout(() => {
-                            initializePage();
-                        }, 500);
-                    } else {
-                        showMessage('❌ Supabase connection failed. Please check configuration and try again.', 'error');
-                    }
-                    
-                    // Setup button click handler
-                    document.getElementById('resetBtn').addEventListener('click', handlePasswordReset);
-                    
-                    // Setup input validation
-                    document.getElementById('confirmPassword').addEventListener('input', function(e) {
-                        const password = document.getElementById('password').value;
-                        const confirmPassword = e.target.value;
-                        
-                        if (confirmPassword && password !== confirmPassword) {
-                            e.target.style.borderColor = '#EF4444';
-                        } else {
-                            e.target.style.borderColor = '#374151';
-                        }
-                    });
-                } else {
-                    showMessage('Failed to initialize authentication system. Please refresh the page.', 'error');
-                }
-            } catch (error) {
-                console.error('❌ Failed to load Supabase script:', error);
-                showMessage('Failed to load authentication system. Please check your internet connection and refresh the page.', 'error');
+            // Check if Supabase is available
+            if (!window.supabase) {
+                showStatus('error', 'Failed to load authentication system. Please refresh the page.');
+                return;
             }
+            
+            // Check session after a brief delay
+            setTimeout(() => {
+                checkSession();
+            }, 1000);
         });
-    </script>
 
-    <!-- Particles.js for AI futuristic background effect -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
-    <script>
-        particlesJS('particles', {
-            particles: {
-                number: { value: 60, density: { enable: true, value_area: 800 } },
-                color: { value: ['#00ffff', '#ff00ff', '#60A5FA'] },
-                shape: { type: 'circle' },
-                opacity: { value: 0.3, random: true },
-                size: { value: 2, random: true },
-                line_linked: { enable: true, distance: 150, color: '#ffffff', opacity: 0.2, width: 1 },
-                move: { enable: true, speed: 1, direction: 'none', random: true, straight: false, out_mode: 'out', bounce: false }
-            },
-            interactivity: {
-                detect_on: 'canvas',
-                events: { onhover: { enable: true, mode: 'repulse' }, onclick: { enable: false }, resize: true },
-                modes: { repulse: { distance: 100 } }
-            },
-            retina_detect: true
+        // Handle form submission
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add input validation
+            document.getElementById('confirmPassword').addEventListener('input', function() {
+                const password = document.getElementById('password').value;
+                const confirmPassword = this.value;
+                
+                if (confirmPassword && password !== confirmPassword) {
+                    this.style.borderColor = '#dc3545';
+                } else {
+                    this.style.borderColor = '#ddd';
+                }
+            });
         });
     </script>
 </body>
